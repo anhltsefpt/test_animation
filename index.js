@@ -1,3 +1,44 @@
+var capturer;
+
+function init() {
+
+    var sCB = document.getElementById( 'start-capturing-button' ),
+        dVB = document.getElementById( 'download-video-button' ),
+        progress = document.getElementById( 'progress' );
+
+    sCB.addEventListener( 'click', function( e ) {
+        var framerate = document.querySelector('input[name="framerate"]:checked').value;
+        capturer = new CCapture( {
+            verbose: true,
+            display: true,
+            framerate: framerate,
+            motionBlurFrames: ( 960 / framerate ) * ( document.querySelector('input[name="motion-blur"]').checked ? 1 : 0 ),
+            quality: 99,
+            format: document.querySelector('input[name="encoder"]:checked').value,
+            workersPath: '../javascript/',
+            timeLimit: 4,
+            frameLimit: 0,
+            autoSaveTime: 0,
+            onProgress: function( p ) { progress.style.width = ( p * 100 ) + '%' }
+        } );
+
+        capturer.start();
+        this.style.display = 'none';
+        dVB.style.display = 'block';
+        e.preventDefault();
+        console.log('Start Capture End')
+    }, false );
+
+    dVB.addEventListener( 'click', function( e ) {
+        capturer.stop();
+        console.log('Stop Capture')
+        this.style.display = 'none';
+        //this.setAttribute( 'href',  );
+        capturer.save();
+    }, false );
+}
+window.addEventListener( 'load', init, false );
+
 let canvas = document.getElementById("canvas")
 let ctx = canvas.getContext('2d')
 
@@ -9,6 +50,11 @@ let SCROLL_SENSITIVITY = 0.0005
 
 function draw()
 {
+    requestAnimationFrame( draw )
+    render();
+}
+
+function render() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     
@@ -36,8 +82,7 @@ function draw()
     ctx.rotate(31*Math.PI / 180)
     
     drawText("Wow, you found me!", -260, -2000, 48, "courier")
-    
-    requestAnimationFrame( draw )
+    if( capturer ) capturer.capture( canvas);
 }
 
 // Gets the relevant location from a mouse or single touch event
