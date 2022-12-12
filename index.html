@@ -1,0 +1,87 @@
+<!-- This is a very basic canvas example which allows for panning and zooming using a mouse (Click & drag & scrollwheel) or touchscreen (tap and drag to pan, pinch to zoom). -->
+<html>
+    <head>
+        
+        <link rel="stylesheet" href="index.css">
+        <title>Title of the document</title>
+    </head>
+    <body>
+        <div id="scroller" >
+            <div id="title">
+                <h1>CCapture.js example</h1><h2>Game of Life in 3D</h2>
+                <p>Example of <a href="#" >ccapture.js</a> using <a href="http://www.clicktorelease.com/code/conway3d/" >Game of Life in 3D</a>.</p>
+                <p>This is a simple example of how to add a few lines of code to capture video out of a canvas-based animation.</p>
+                <p><b>Framerate</b><br/>
+                    <input type="radio" name="framerate" id="encode-10" value="10" ></input> <label for="encode-10" >10FPS</label>
+                    <input type="radio" name="framerate" id="encode-30" value="30" checked="checked" ></input></input> <label for="encode-30" >30FPS</label>
+                    <input type="radio" name="framerate" id="encode-60" value="60" ></input></input> <label for="encode-60" >60FPS</label>
+                    <input type="radio" name="framerate" id="encode-120" value="120" ></input></input> <label for="encode-120" >120FPS</label></p>
+                <p><b>Format</b><br/>
+                    <input type="radio" name="encoder" id="encode-webm" value="webm" checked="checked" ></input> <label for="encode-webm" >WebM</label>
+                    <input type="radio" name="encoder" id="encode-gif" value="gif" ></input></input> <label for="encode-gif" >GIF</label>
+                    <input type="radio" name="encoder" id="encode-png" value="png" ></input></input> <label for="encode-png" >PNG</label>
+                    <input type="radio" name="encoder" id="encode-jpg" value="jpg" ></input></input> <label for="encode-jpg" >JPEG</label></p>
+                    <input type="radio" name="encoder" id="encode-webm-mediarecorder" value="webm-mediarecorder" ></input> <label for="encode-webm-mediarecorder" >WebM (MediaRecorder) <b>WIP</b></label>
+                <p><b>Other options</b><br/>
+                    <input id="apply-motionblur" name="motion-blur" type="checkbox" /> <label for="apply-motionblur">Apply motion blur</label>
+                </p>
+                <a class="button" href="#" id="start-capturing-button" >Start recording</a>
+                <a class="button" href="#" id="download-video-button" >Stop recording and view capture</a>
+            </div>
+        </div>
+        <canvas id="canvas"></canvas>
+    </body>
+</html>
+
+<script src="index.js"></script>
+<script src="javascript/CCapture.js"></script>
+<!-- Include WebM Writer if you want to export WebM -->
+<script src="javascript/webm-writer-0.2.0.js"></script>
+<!-- Include gifjs if you want to export GIF -->
+<script src="javascript/gif.js"></script>
+<!-- Include tar.js if you want to export PNG or JPEG -->
+<script src="javascript/tar.js"></script>
+<!-- Include download.js for easier file download -->
+<script src="javascript/download.js"></script>
+<script>
+    function init() {
+        var capturer;
+
+		var sCB = document.getElementById( 'start-capturing-button' ),
+			dVB = document.getElementById( 'download-video-button' ),
+			progress = document.getElementById( 'progress' );
+
+		sCB.addEventListener( 'click', function( e ) {
+			var framerate = document.querySelector('input[name="framerate"]:checked').value;
+			capturer = new CCapture( {
+				verbose: true,
+				display: true,
+				framerate: framerate,
+				motionBlurFrames: ( 960 / framerate ) * ( document.querySelector('input[name="motion-blur"]').checked ? 1 : 0 ),
+				quality: 99,
+				format: document.querySelector('input[name="encoder"]:checked').value,
+                workersPath: '../javascript/',
+				timeLimit: 4,
+				frameLimit: 0,
+				autoSaveTime: 0,
+				onProgress: function( p ) { progress.style.width = ( p * 100 ) + '%' }
+			} );
+
+			capturer.start();
+            if( capturer ) capturer.capture( document.getElementById('canvas') );
+			this.style.display = 'none';
+			dVB.style.display = 'block';
+			e.preventDefault();
+            console.log('Start Capture End')
+		}, false );
+
+		dVB.addEventListener( 'click', function( e ) {
+			capturer.stop();
+            console.log('Stop Capture')
+			this.style.display = 'none';
+			//this.setAttribute( 'href',  );
+			capturer.save();
+		}, false );
+    }
+    window.addEventListener( 'load', init, false );
+</script>
