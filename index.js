@@ -15,7 +15,7 @@ function init() {
             motionBlurFrames: ( 960 / framerate ) * ( document.querySelector('input[name="motion-blur"]').checked ? 1 : 0 ),
             quality: 99,
             format: document.querySelector('input[name="encoder"]:checked').value,
-            workersPath: '../javascript/',
+            workersPath: './javascript/',
             timeLimit: 4,
             frameLimit: 0,
             autoSaveTime: 0,
@@ -193,13 +193,24 @@ function adjustZoom(zoomAmount, zoomFactor)
     }
 }
 
+var count = 0
+
+setInterval(() => {
+    if (count%2 === 1) {
+        adjustZoom(0.05)
+    } else {
+        adjustZoom(-0.05)
+    }
+    count ++
+}, 500)
+
 // canvas.addEventListener('mousedown', onPointerDown)
 // canvas.addEventListener('touchstart', (e) => handleTouch(e, onPointerDown))
 // canvas.addEventListener('mouseup', onPointerUp)
 // canvas.addEventListener('touchend',  (e) => handleTouch(e, onPointerUp))
 // canvas.addEventListener('mousemove', onPointerMove)
 // canvas.addEventListener('touchmove', (e) => handleTouch(e, onPointerMove))
-canvas.addEventListener( 'wheel', (e) => adjustZoom(e.deltaY*SCROLL_SENSITIVITY))
+// canvas.addEventListener( 'wheel', (e) => adjustZoom(e.deltaY*SCROLL_SENSITIVITY))
 
 // Ready, set, go
 draw()
